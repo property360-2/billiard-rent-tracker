@@ -4,16 +4,23 @@ from django.utils import timezone
 from django.db.models import Sum, Count
 from django.views.decorators.http import require_POST
 from .models import Table, Session, Transaction
+from .services import AnalyticsService
 import json
 
 def index(request):
     tables = Table.objects.all().order_by('table_number')
     active_sessions = Session.objects.filter(status='active').select_related('table')
     
+    # Get analytics data
+    peak_hours = AnalyticsService.get_peak_hours()
+    weekly_trends = AnalyticsService.get_weekly_trends()
+    
     context = {
         'tables': tables,
         'active_sessions': active_sessions,
         'now': timezone.now(),
+        'peak_hours_data': json.dumps(peak_hours),
+        'weekly_trends_data': json.dumps(weekly_trends),
     }
     return render(request, 'monitor/index.html', context)
 
@@ -61,6 +68,34 @@ def end_session(request, session_id):
     table = session.table
     table.status = 'available'
     table.save()
+    
+    return JsonResponse({'success': True})
+
+@require_POST
+def extend_session(request, session_id):
+    session = get_object_or_404(Session, id=session_id)
+    
+    # Extend by 1 hour (or passed duration)
+    # For now, just fixed 1 hour extension
+    session.duration += 1
+    session.save() # save() method will recalculate amount
+    
+    return JsonResponse({'success': True})
+
+@require_POST
+def cancel_session(request, session_id):
+    session = get_object_or_404(Session, id=session_id)
+    
+    # Delete transaction first if exists
+    Transaction.objects.filter(session=session).delete()
+    
+    # Update table status
+    table = session.table
+    table.status = 'available'
+    table.save()
+    
+    # Delete session
+    session.delete()
     
     return JsonResponse({'success': True})
 
@@ -121,3 +156,47 @@ def table_status(request):
         })
     
     return JsonResponse({'tables': tables_data})
+
+def manage_tables(request):
+    tables = Table.objects.all().order_by('table_number')
+    return render(request, 'monitor/manage_tables.html', {'tables': tables})
+
+@require_POST
+def add_table(request):
+    try:
+        data = json.loads(request.body)
+        table_number = int(data.get('table_number'))
+        
+        if Table.objects.filter(table_number=table_number).exists():
+            return JsonResponse({'error': 'Table number already exists'}, status=400)
+            
+        Table.objects.create(table_number=table_number)
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+@require_POST
+def edit_table(request, table_id):
+    try:
+        table = get_object_or_404(Table, id=table_id)
+        data = json.loads(request.body)
+        table_number = int(data.get('table_number'))
+        
+        if Table.objects.filter(table_number=table_number).exclude(id=table_id).exists():
+            return JsonResponse({'error': 'Table number already exists'}, status=400)
+            
+        table.table_number = table_number
+        table.save()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+@require_POST
+def delete_table(request, table_id):
+    table = get_object_or_404(Table, id=table_id)
+    
+    if table.session_set.filter(status='active').exists():
+        return JsonResponse({'error': 'Cannot delete table with active session'}, status=400)
+        
+    table.delete()
+    return JsonResponse({'success': True})

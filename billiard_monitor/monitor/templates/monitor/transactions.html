@@ -14,7 +14,7 @@
 
     <!-- Daily Summary -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl shadow-lg p-6 text-white">
+        <div class="bg-gradient-to-r from-green-500 to-emerald-500 dark:from-green-600 dark:to-emerald-600 rounded-xl shadow-lg p-6 text-white transition-colors">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-90">Today's Earnings</div>
@@ -24,7 +24,7 @@
             </div>
         </div>
         
-        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl shadow-lg p-6 text-white">
+        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 dark:from-blue-600 dark:to-cyan-600 rounded-xl shadow-lg p-6 text-white transition-colors">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-90">Sessions Today</div>
@@ -36,66 +36,66 @@
     </div>
 
     <!-- Transactions Table -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-md overflow-hidden transition-colors">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Time
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Table
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Duration
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Amount
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Start - End
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Status
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-gray-700">
                     {% for transaction in transactions %}
-                    <tr class="hover:bg-gray-50 transition">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ transaction.transaction_time|time }}</div>
-                            <div class="text-xs text-gray-500">{{ transaction.transaction_time|date:"M j" }}</div>
+                            <div class="text-sm text-gray-900 dark:text-gray-100">{{ transaction.transaction_time|time }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ transaction.transaction_time|date:"M j" }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                                    <span class="text-sm font-bold text-green-700">{{ transaction.table.table_number }}</span>
+                                <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
+                                    <span class="text-sm font-bold text-green-700 dark:text-green-300">{{ transaction.table.table_number }}</span>
                                 </div>
-                                <span class="text-sm font-medium text-gray-900">Table {{ transaction.table.table_number }}</span>
+                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Table {{ transaction.table.table_number }}</span>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                                 {{ transaction.session.duration }} hour{{ transaction.session.duration|pluralize }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-lg font-bold text-green-600">₱{{ transaction.session.amount }}</div>
+                            <div class="text-lg font-bold text-green-600 dark:text-green-400">₱{{ transaction.session.amount }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ transaction.session.start_time|time }}</div>
-                            <div class="text-xs text-gray-500">to {{ transaction.session.end_time|time|default:"-" }}</div>
+                            <div class="text-sm text-gray-900 dark:text-gray-100">{{ transaction.session.start_time|time }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">to {{ transaction.session.end_time|time|default:"-" }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             {% if transaction.session.status == 'completed' %}
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                                 <span class="material-icons text-xs mr-1">check_circle</span>
                                 Completed
                             </span>
                             {% else %}
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
                                 <span class="material-icons text-xs mr-1">schedule</span>
                                 Active
                             </span>
@@ -105,8 +105,8 @@
                     {% empty %}
                     <tr>
                         <td colspan="6" class="px-6 py-12 text-center">
-                            <span class="material-icons text-gray-300 text-5xl mb-4">receipt_long</span>
-                            <p class="text-gray-500">No transactions today</p>
+                            <span class="material-icons text-gray-300 dark:text-gray-600 text-5xl mb-4">receipt_long</span>
+                            <p class="text-gray-500 dark:text-gray-400">No transactions today</p>
                         </td>
                     </tr>
                     {% endfor %}

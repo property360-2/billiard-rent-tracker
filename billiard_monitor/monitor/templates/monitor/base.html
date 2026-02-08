@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Billiard Monitor</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#0f172a',
+                            card: '#1e293b',
+                            text: '#f1f5f9',
+                            muted: '#94a3b8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -30,10 +47,32 @@
         .status-near-end {
             background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
         }
+        
+        /* Dark mode overrides for status gradients */
+        .dark .status-available {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-color: #334155;
+        }
+        .dark .status-active {
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            border-color: #059669;
+        }
+        .dark .status-near-end {
+            background: linear-gradient(135deg, #713f12 0%, #854d0e 100%);
+            border-color: #d97706;
+        }
     </style>
+    <script>
+        // Check local storage for theme
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
 </head>
-<body class="bg-gray-50">
-    <nav class="bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg">
+<body class="bg-gray-50 dark:bg-dark-bg transition-colors duration-200">
+    <nav class="bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-900 dark:to-emerald-900 text-white shadow-lg transition-colors duration-200">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-2">
@@ -41,14 +80,24 @@
                     <h1 class="text-xl font-bold">Billiard Monitor</h1>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="{% url 'index' %}" class="hover:bg-green-700 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+                    <a href="{% url 'index' %}" class="hover:bg-green-700 dark:hover:bg-green-800 px-3 py-2 rounded-lg transition flex items-center space-x-1">
                         <span class="material-icons">dashboard</span>
                         <span>Dashboard</span>
                     </a>
-                    <a href="{% url 'transactions' %}" class="hover:bg-green-700 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+                    <a href="{% url 'transactions' %}" class="hover:bg-green-700 dark:hover:bg-green-800 px-3 py-2 rounded-lg transition flex items-center space-x-1">
                         <span class="material-icons">receipt</span>
                         <span>Transactions</span>
                     </a>
+                    <a href="{% url 'manage_tables' %}" class="hover:bg-green-700 dark:hover:bg-green-800 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+                        <span class="material-icons">settings</span>
+                        <span>Manage</span>
+                    </a>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button id="theme-toggle" class="p-2 rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition focus:outline-none">
+                        <span id="theme-toggle-dark-icon" class="material-icons hidden">dark_mode</span>
+                        <span id="theme-toggle-light-icon" class="material-icons hidden">light_mode</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -59,5 +108,36 @@
     </main>
 
     {% block extra_js %}{% endblock %}
+    
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        // Change the icons inside the button based on previous settings
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        var themeToggleBtn = document.getElementById('theme-toggle');
+
+        themeToggleBtn.addEventListener('click', function() {
+
+            // toggle icons inside button
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            // if set via local storage previously
+            if (localStorage.theme === 'dark') {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+            
+        });
+    </script>
 </body>
 </html>
