@@ -37,7 +37,8 @@ Fill in the details as follows:
 -   **Name**: `billiard-monitor` (or any name you like)
 -   **Region**: Choose the one closest to you (e.g., Singapore for Asia).
 -   **Branch**: `main`
--   **Root Directory**: Leave empty (defaults to root).
+-   **Root Directory**: `billiard_monitor`
+    > **Important**: Since your project files (manage.py, requirements.txt) are inside a folder named `billiard_monitor`, you MUST set this field to `billiard_monitor`.
 -   **Runtime**: **Python 3**
 -   **Build Command**: `./build.sh`
 -   **Start Command**: `gunicorn billiard_monitor.wsgi:application`
@@ -73,3 +74,31 @@ To use PostgreSQL instead:
 2.  Copy the `Internal Database URL`.
 3.  Add it as an environment variable `DATABASE_URL` in your Web Service.
 4.  Update `settings.py` to use `dj_database_url` to parse it (requires installing `dj-database-url` and `psycopg2-binary`).
+
+## Troubleshooting
+
+### "build.sh: No such file or directory" or "Permission denied"
+If `build.sh` keeps failing, you can bypass it by using the commands directly in Render:
+
+1.  Go to **Settings** > **General** > **Build & Deploy**.
+2.  Change **Build Command** from `./build.sh` to:
+    ```bash
+    pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate
+    ```
+3.  Click **Save Changes**.
+4.  Click **Manual Deploy** -> **Deploy latest commit**.
+
+### "No such file or directory: 'requirements.txt'"
+This means Render is looking in the wrong folder.
+1.  Go to **Settings** > **General** > **Root Directory**.
+2.  Set it to `billiard_monitor`.
+3.  Save and Redploy.
+
+3.  Save and Redploy.
+
+### "ModuleNotFoundError: No module named 'management'"
+This happens if Python cannot treat the `management` directory as a package. 
+I have fixed this by adding an `__init__.py` file to that directory. The latest push should resolve it.
+
+### Database Resetting
+As mentioned, SQLite resets on every deploy. Verify this is acceptable for your use case or switch to PostgreSQL.
