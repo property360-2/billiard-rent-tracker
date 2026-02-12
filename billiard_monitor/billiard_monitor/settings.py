@@ -24,21 +24,36 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', "django-insecure-^3_%**^d^nojlv-!(l0cua0qempu$kf%j@)e6xc78x*)!ebn+s")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Check for RENDER environment variable for production logic if needed, but mainly use DEBUG env var.
-DEBUG = 'RENDER' not in os.environ
+# Check for production environments
+IS_RENDER = 'RENDER' in os.environ
+IS_PYTHONANYWHERE = 'PYTHONANYWHERE_SITE' in os.environ or 'PYTHONANYWHERE_DOMAIN' in os.environ
 
-ALLOWED_HOSTS = ['*']
+DEBUG = not (IS_RENDER or IS_PYTHONANYWHERE)
 
+# Override with environment variable if present
+if 'DEBUG' in os.environ:
+    DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+
+ALLOWED_HOSTS = ['*', '.pythonanywhere.com', '.onrender.com']
+
+# Add specific hosts if in production
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+PA_DOMAIN = os.environ.get('PYTHONANYWHERE_DOMAIN')
+if PA_DOMAIN:
+    ALLOWED_HOSTS.append(PA_DOMAIN)
+
 # CSRF & Session Security
 if not DEBUG:
     CSRF_TRUSTED_ORIGINS = [
-        f'https://{RENDER_EXTERNAL_HOSTNAME}',
-        'https://*.onrender.com'
+        'https://*.onrender.com',
+        'https://*.pythonanywhere.com'
     ]
+    if RENDER_EXTERNAL_HOSTNAME:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+    
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
