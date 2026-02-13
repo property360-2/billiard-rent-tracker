@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
+
 
 urlpatterns = [
     # Monitor App URLs
@@ -17,4 +18,7 @@ urlpatterns = [
     path('manage/add/', views.add_table, name='add_table'),
     path('manage/edit/<int:table_id>/', views.edit_table, name='edit_table'),
     path('manage/delete/<int:table_id>/', views.delete_table, name='delete_table'),
+    
+    # Auth URLs
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

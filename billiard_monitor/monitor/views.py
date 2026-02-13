@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+
 from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Sum, Count
@@ -7,6 +9,7 @@ from .models import Table, Session, Transaction
 from .services import AnalyticsService
 import json
 
+@login_required
 def index(request):
     tables = Table.objects.all().order_by('table_number')
     active_sessions = Session.objects.filter(status='active').select_related('table')
@@ -24,6 +27,7 @@ def index(request):
     }
     return render(request, 'monitor/index.html', context)
 
+@login_required
 def start_session(request, table_id):
     if request.method == 'POST':
         table = get_object_or_404(Table, id=table_id)
@@ -55,6 +59,7 @@ def start_session(request, table_id):
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+@login_required
 @require_POST
 def end_session(request, session_id):
     session = get_object_or_404(Session, id=session_id)
@@ -71,6 +76,7 @@ def end_session(request, session_id):
     
     return JsonResponse({'success': True})
 
+@login_required
 @require_POST
 def extend_session(request, session_id):
     session = get_object_or_404(Session, id=session_id)
@@ -82,6 +88,7 @@ def extend_session(request, session_id):
     
     return JsonResponse({'success': True})
 
+@login_required
 @require_POST
 def cancel_session(request, session_id):
     session = get_object_or_404(Session, id=session_id)
@@ -99,6 +106,7 @@ def cancel_session(request, session_id):
     
     return JsonResponse({'success': True})
 
+@login_required
 def transactions(request):
     today = timezone.now().date()
     transactions_today = Transaction.objects.filter(
@@ -121,6 +129,7 @@ def transactions(request):
     }
     return render(request, 'monitor/transactions.html', context)
 
+@login_required
 def get_active_sessions(request):
     active_sessions = Session.objects.filter(status='active').select_related('table')
     
@@ -139,6 +148,7 @@ def get_active_sessions(request):
     
     return JsonResponse({'sessions': sessions_data})
 
+@login_required
 def table_status(request):
     tables = Table.objects.all().order_by('table_number')
     
@@ -157,10 +167,12 @@ def table_status(request):
     
     return JsonResponse({'tables': tables_data})
 
+@login_required
 def manage_tables(request):
     tables = Table.objects.all().order_by('table_number')
     return render(request, 'monitor/manage_tables.html', {'tables': tables})
 
+@login_required
 @require_POST
 def add_table(request):
     try:
@@ -175,6 +187,7 @@ def add_table(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
+@login_required
 @require_POST
 def edit_table(request, table_id):
     try:
@@ -191,6 +204,7 @@ def edit_table(request, table_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
+@login_required
 @require_POST
 def delete_table(request, table_id):
     table = get_object_or_404(Table, id=table_id)

@@ -80,6 +80,7 @@
                     <h1 class="text-xl font-bold">Billiard Monitor</h1>
                 </div>
                 <div class="flex items-center space-x-4">
+                    {% if user.is_authenticated %}
                     <a href="{% url 'index' %}" class="hover:bg-green-700 dark:hover:bg-green-800 px-3 py-2 rounded-lg transition flex items-center space-x-1">
                         <span class="material-icons">dashboard</span>
                         <span>Dashboard</span>
@@ -92,6 +93,14 @@
                         <span class="material-icons">settings</span>
                         <span>Manage</span>
                     </a>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="hover:bg-red-700 dark:hover:bg-red-800 px-3 py-2 rounded-lg transition flex items-center space-x-1 text-red-100">
+                            <span class="material-icons">logout</span>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                    {% endif %}
                     
                     <!-- Dark Mode Toggle -->
                     <button id="theme-toggle" class="p-2 rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition focus:outline-none">
@@ -99,6 +108,7 @@
                         <span id="theme-toggle-light-icon" class="material-icons hidden">light_mode</span>
                     </button>
                 </div>
+
             </div>
         </div>
     </nav>
